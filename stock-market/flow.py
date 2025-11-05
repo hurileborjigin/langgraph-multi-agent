@@ -7,10 +7,12 @@ from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI
 from colorama import Fore
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Create LLM
-llm = AzureChatOpenAI(azure_deployment='gpt-4o')
+llm = AzureChatOpenAI(azure_deployment="gpt-4o")
+
 
 # Create State
 class State(dict):
@@ -20,9 +22,10 @@ class State(dict):
 # Build llm node
 def chatbot(state: State):
     # Get LLM response
-    response = llm.invoke(state['messages'])
+    response = llm.invoke(state["messages"])
     # Return response in correct message format
     return {"messages": [{"role": "assistant", "content": response.content}]}
+
 
 # Assemble a graph
 graph_builder = StateGraph(State)
@@ -39,18 +42,8 @@ graph = graph_builder.compile(checkpointer=memory)
 if __name__ == "__main__":
     while True:
         prompt = input("\n🤖Input your prompt:")
-        res = graph.invoke({
-            "messages": [{
-                "role": "user",
-                "content": prompt
-                }]},
-            config={
-                "configurable": 
-                    {
-                        "thread_id": 1234
-                        }
-                    }
-            )
-        print(Fore.LIGHTYELLOW_EX + res['messages'][-1].content + Fore.RESET)
-
-
+        res = graph.invoke(
+            {"messages": [{"role": "user", "content": prompt}]},
+            config={"configurable": {"thread_id": 1234}},
+        )
+        print(Fore.LIGHTYELLOW_EX + res["messages"][-1].content + Fore.RESET)
